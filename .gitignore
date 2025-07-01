@@ -1,0 +1,7 @@
+.idea
+bin
+obj
+packages
+Directory.Build.targets
+Folder.DotSettings.user
+build/

@@ -1,0 +1,19 @@
+﻿<Project>
+    <PropertyGroup>
+        <DvInstallDir>D:\Programs\Derail Valley</DvInstallDir>
+        <UnityInstallDir>F:\Programs\Unity\2019.4.40f1\Editor</UnityInstallDir>
+        <ReferencePath>
+            $(DvInstallDir)\DerailValley_Data\Managed\;
+            $(DvInstallDir)\DerailValley_Data\Managed\UnityModManager\;
+            $(UnityInstallDir)\Data\Managed\
+        </ReferencePath>
+        <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);</AssemblySearchPaths>
+    </PropertyGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<!-- Copy to build folder -->
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="build/" />
+
+		<!-- Copy to game folder -->
+		<Copy Condition="Exists('$(DvInstallDir)')" SourceFiles="$(TargetPath);README.md;info.json;LICENSE" DestinationFolder="$(DvInstallDir)/Mods/better_comms_radio" />
+	</Target>
+</Project>

@@ -1,0 +1,8 @@
+{
+	"Id": "better_comms_radio",
+	"Version": "0.0.1",
+	"DisplayName": "better_comms_radio",
+	"Author": "Tostiman",
+	"EntryMethod": "better_comms_radio.Main.Load",
+	"AssemblyName": "better_comms_radio.dll"
+}
