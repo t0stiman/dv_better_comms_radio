@@ -1,8 +1,10 @@
 {
 	"Id": "better_comms_radio",
 	"Version": "0.0.1",
-	"DisplayName": "better_comms_radio",
+	"DisplayName": "Better Comms Radio",
 	"Author": "Tostiman",
 	"EntryMethod": "better_comms_radio.Main.Load",
-	"AssemblyName": "better_comms_radio.dll"
+	"AssemblyName": "better_comms_radio.dll",
+    "HomePage": "https://github.com/t0stiman/dv_better_comms_radio",
+    "Repository": "https://raw.githubusercontent.com/t0stiman/dv_better_comms_radio/master/repository.json"
 }
