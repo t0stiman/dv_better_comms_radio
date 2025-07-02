@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using DV;
-using DV.Localization;
 using DV.ThingTypes;
 using HarmonyLib;
-using TMPro;
 using UnityEngine;
 
 namespace better_comms_radio.Patches;
@@ -50,18 +49,31 @@ public class CommsRadioCarSpawner_SetCarTypeToSpawn_Patch
 		__instance.carTypeToSpawn = carType;
 		
 		var lines = new string[Math.Min(LinesHelper.MAX_LINE_COUNT, __instance.carTypesToSpawn.Count)];
-		lines[0] = LinesHelper.CreateLine(carType, true);
+		var middleLineIndex = LinesHelper.MiddleLineIndex(lines.Length);
+		lines[middleLineIndex] = LinesHelper.CreateLine(carType, true);
 
+		//next cartypes, displayed below the selected
 		var carTypeIndex = __instance.selectedCarTypeIndex;
-		for (var index = 1; index < LinesHelper.MAX_LINE_COUNT; index++)
+		for (var index = middleLineIndex+1; index < lines.Length; index++)
 		{
-			var aCar = CommsRadioCarSpawner.IncOrDec(true, __instance.carTypesToSpawn, ref carTypeIndex,
-				CommsRadioCarSpawner.IsCarTypeUnlocked);
-			lines[index] = LinesHelper.CreateLine(aCar, false);
+			lines[index] = LinesHelper.CreateLine(NextPreviousCartype(true, __instance.carTypesToSpawn, ref carTypeIndex), false);
+		}
+		
+		//previous cartypes, displayed above the selected
+		carTypeIndex = __instance.selectedCarTypeIndex;
+		for (var index = middleLineIndex-1; index >= 0; index--)
+		{
+			lines[index] = LinesHelper.CreateLine(NextPreviousCartype(false, __instance.carTypesToSpawn, ref carTypeIndex), false);
 		}
 
 		LinesHelper.SetContent(__instance.display, lines);
 		return false;
+	}
+	
+	private static TrainCarType_v2 NextPreviousCartype(bool next, List<TrainCarType_v2> carTypes, ref int carTypeIndex)
+	{
+		return CommsRadioCarSpawner.IncOrDec(false, carTypes, ref carTypeIndex,
+			CommsRadioCarSpawner.IsCarTypeUnlocked);
 	}
 }
 
@@ -75,29 +87,44 @@ public class CommsRadioCarSpawner_SetCarLiveryToSpawn_Patch
 		
 		if (!__instance.carPrefabToSpawn)
 		{
-			Debug.LogError($"Couldn't load car prefab: {carLivery}! Won't be able to spawn __instance car.", __instance);
+			Debug.LogError($"Couldn't load car prefab: {carLivery}! Won't be able to spawn this car.", __instance);
 		}
 		else
 		{
 			var trainCar = __instance.carPrefabToSpawn.GetComponent<TrainCar>();
 			__instance.carBounds = trainCar.Bounds;
 
-			var loco = __instance.state == CommsRadioCarSpawner.State.PickLoco;
-			var liveries = loco ? __instance.locoLiveries : __instance.carLiveriesToSpawn[__instance.carTypeToSpawn];
-			var lines = new string[Math.Min(LinesHelper.MAX_LINE_COUNT, liveries.Count)];
-			lines[0] = LinesHelper.CreateLine(carLivery, true);
+			var pickingLocomotive = __instance.state == CommsRadioCarSpawner.State.PickLoco;
+			var liveries = pickingLocomotive ? __instance.locoLiveries : __instance.carLiveriesToSpawn[__instance.carTypeToSpawn];
+			var selectedLiveryIndex = pickingLocomotive ? __instance.selectedLocoIndex : __instance.selectedCarLiveryIndex;
 			
-			var liveryIndex = loco ? __instance.selectedLocoIndex : __instance.selectedCarLiveryIndex;
-			for (var index = 1; index < lines.Length; index++)
+			var lines = new string[Math.Min(LinesHelper.MAX_LINE_COUNT, liveries.Count)];
+			var middleLineIndex = LinesHelper.MiddleLineIndex(lines.Length);
+			lines[middleLineIndex] = LinesHelper.CreateLine(carLivery, true);
+			
+			//next liveries, displayed below the selected
+			var liveryIndex = selectedLiveryIndex;
+			for (var index = middleLineIndex+1; index < lines.Length; index++)
 			{
-				var livery = CommsRadioCarSpawner.IncOrDec(true, liveries, ref liveryIndex,
-					CommsRadioCarSpawner.IsCarLiveryUnlocked);
-				lines[index] = LinesHelper.CreateLine(livery, false);
+				lines[index] = LinesHelper.CreateLine(NextPreviousLivery(true, liveries, ref liveryIndex), false);
+			}
+		
+			//previous liveries, displayed above the selected
+			liveryIndex = selectedLiveryIndex;
+			for (var index = middleLineIndex-1; index >= 0; index--)
+			{
+				lines[index] = LinesHelper.CreateLine(NextPreviousLivery(false, liveries, ref liveryIndex), false);
 			}
 			
 			LinesHelper.SetContent(__instance.display, lines);
 		}
 		
 		return false;
+	}
+
+	private static TrainCarLivery NextPreviousLivery(bool next, List<TrainCarLivery> liveries, ref int liveryIndex)
+	{
+		return CommsRadioCarSpawner.IncOrDec(next, liveries, ref liveryIndex,
+			CommsRadioCarSpawner.IsCarLiveryUnlocked);
 	}
 }
