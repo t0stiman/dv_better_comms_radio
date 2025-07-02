@@ -1,4 +1,5 @@
 ﻿using DV;
+using DV.Customization.Paint;
 using DV.Localization;
 using DV.ThingTypes;
 using TMPro;
@@ -10,9 +11,13 @@ public static class LinesHelper
 {
 	public const int MAX_LINE_COUNT = 6;
 	
+	public static string CreateLine(PaintTheme theme, bool selected)
+	{
+		return CreateLine(theme.LocalizedName, selected);
+	}
+	
 	public static string CreateLine(TrainCarType_v2 carType, bool selected)
 	{
-		Main.Log($"cartype: {carType}, selected: {selected}");
 		return CreateLine(LocalizationAPI.L(carType.localizationKey), selected);
 	}
 	
